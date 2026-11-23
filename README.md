@@ -6,7 +6,7 @@ This repository contains no applicant data. Never commit capture backups or Exce
 
 ## Online
 
-- Main page (the data capture form): https://aflalf.github.io/sarp-yed/
+- Main page (the system demo; the data capture form is in its menu): https://aflalf.github.io/sarp-yed/
 - Demo: https://aflalf.github.io/sarp-yed/demo/sarp-yed-demo.html
 - Capture form: https://aflalf.github.io/sarp-yed/capture-form/SARP_YED_Data_Capture.html (for showing the form; use the downloaded file for real data)
 
@@ -14,7 +14,7 @@ This repository contains no applicant data. Never commit capture backups or Exce
 
 | Folder | Contents |
 | --- | --- |
-| `index.html` | The data capture form, served as the main page of the site. Keep it identical to `capture-form/SARP_YED_Data_Capture.html`. |
+| `index.html` | The system demo, served as the main page of the site; its "Data capture form" menu item opens `capture-form/SARP_YED_Data_Capture.html` inside it. Keep it identical to `demo/sarp-yed-demo.html`. |
 | `capture-form/` | `SARP_YED_Data_Capture.html`: offline pre-registration capture form (single file, Chrome or Edge). `ds_gn_audit_list.json`: the DS/GN audit list built into the form (6 districts, 61 DS, 1,604 GN). |
 | `demo/` | `sarp-yed-demo.html`: clickable demo of the full management system (9 roles, 31 fictional applicants, capture import), aligned to specification v1.2. |
 | `docs/` | Functional and technical specification v1.2, capture-form QA results, demo script. |

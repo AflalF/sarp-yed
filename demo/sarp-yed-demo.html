@@ -45,7 +45,7 @@ h2{font-size:16px;margin:0 0 10px}
 h3{font-size:14px;margin:0 0 8px}
 .sub{color:var(--muted);margin:0 0 18px}
 .grid{display:grid;gap:14px}
-[hidden]{display:none!important}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}.g6{grid-template-columns:repeat(6,minmax(0,1fr))}
+[hidden]{display:none!important}a.btn{text-decoration:none;display:inline-flex;align-items:center}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}.g6{grid-template-columns:repeat(6,minmax(0,1fr))}
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
 .kpi .v{font-size:26px;font-weight:700;color:var(--forest);line-height:1.1}
 .kpi .l{color:var(--muted);font-size:12.5px;margin-top:4px}
@@ -571,6 +571,7 @@ const NAV = [
   ["queue:PMA", "Approvals", ["MG"]],
   ["queue:AFS,SUB,USR", "SARP tracking", ["SL", "GO", "PMU", "MG"]],
   ["audit", "Audit log", ["MG", "AD"]],
+  ["capture", "Data capture form", ["FO", "ST", "MG", "AD"]],
   ["import", "Import capture", ["AD"]],
   ["settings", "Settings", ["AD", "MG"]],
 ];
@@ -593,6 +594,7 @@ function render() {
   else if (ui.view === "audit") m.innerHTML = viewAudit();
   else if (ui.view === "settings") m.innerHTML = viewSettings();
   else if (ui.view === "import") m.innerHTML = viewImport();
+  else if (ui.view === "capture") m.innerHTML = viewCapture();
   bindAfterRender();
 }
 function queueHelp(v) {
@@ -809,6 +811,13 @@ function viewRegister() {
     <label class="row small" style="margin-top:6px"><input type="checkbox" name="nicDoc"> NIC copy uploaded (front and back)</label>
     <div class="row small" style="margin-top:8px">2. Indo-Lanka consultancy consent (proposal drafting and related services by Indo-Lanka Greenhouse and Agri Solutions): <label><input type="radio" name="consult" value="Yes"> Yes</label> <label><input type="radio" name="consult" value="No"> No</label> <span class="muted">No does not stop registration.</span></div></div>
   <div class="row" style="margin-top:12px"><button class="btn primary" type="submit">Complete registration</button><button class="btn" type="button" data-fill="1">Fill sample data</button><span class="small muted">District quota: ${DB.apps.filter((a) => a.district === ROLES.FO.scope && !CLOSED.includes(a.status) && a.status !== "DRF").length} / ${d.quota}</span></div></form>`;
+}
+const CAPTURE_URL = (/\/demo\/[^/]*$/.test(location.pathname) ? "../" : "") + "capture-form/SARP_YED_Data_Capture.html";
+function viewCapture() {
+  return `<h1>Data capture form</h1><p class="sub">The offline pre-registration form used before go-live (18 November onwards). Records captured here are later loaded into the system under <b>Import capture</b> (System Administrator). For real applicants, download the form and use it on the capture laptop.</p>
+  <div class="row" style="margin-bottom:12px"><a class="btn primary" href="${CAPTURE_URL}" target="_blank" rel="noopener">Open full screen</a><a class="btn" href="${CAPTURE_URL}" download="SARP_YED_Data_Capture.html">Download for offline use</a></div>
+  <div class="card" style="padding:0;overflow:hidden"><iframe id="capFrame" src="${CAPTURE_URL}" title="SARP YED data capture form" style="width:100%;height:calc(100vh - 230px);min-height:640px;border:0;display:block"></iframe></div>
+  <p class="small muted" id="capMissing" hidden>The form file was not found next to this demo. Open the demo from the website, or keep the capture-form folder beside the demo file.</p>`;
 }
 function viewImport() {
   const last = (DB.imports || [])[0];
@@ -1032,6 +1041,7 @@ function bindAfterRender() {
   const fq = $("#fq"); if (fq) { fq.oninput = () => { ui.filter.q = fq.value; const pos = fq.selectionStart; render(); const n = $("#fq"); n.focus(); n.setSelectionRange(pos, pos); }; $("#fs").onchange = (e) => { ui.filter.status = e.target.value; render(); }; $("#fd").onchange = (e) => { ui.filter.district = e.target.value; render(); }; }
   const form = $("#regForm"); if (form) bindRegister(form);
   if ($("#impFile")) bindImport();
+  if ($("#capFrame") && location.protocol === "file:") { $("#capFrame").addEventListener("error", () => { $("#capMissing").hidden = false; }); }
   document.querySelectorAll("[data-cfg]").forEach((el) => el.onchange = () => { const k = el.dataset.cfg;
     if (!["projectRule", "aiEnabled"].includes(k)) {
       const n = Number(el.value), c = { ...DB.cfg, [k]: n };
