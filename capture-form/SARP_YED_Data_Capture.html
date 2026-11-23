@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SARP YED: Applicant Data Capture (v2)</title>
 <style>
@@ -177,6 +178,7 @@ table.res td{padding:4px}table.res input,table.res select{padding:6px 8px;font-s
 
 <!-- LIST -->
 <section id="tab-list" class="hide">
+<div class="card" id="sumCard"><h2>Session summary</h2><div id="sumBody" class="small"></div></div>
 <div class="card"><h2>Captured records</h2>
  <div class="btns" style="margin-bottom:10px"><input id="search" placeholder="Search name, NIC last 4, mobile, district, GN" style="max-width:360px"></div>
  <div style="overflow-x:auto"><table><thead><tr><th>Ref</th><th>Name</th><th>NIC</th><th>District / DS / GN</th><th>Business</th><th>Status</th><th>Captured</th><th></th></tr></thead><tbody id="rows"></tbody></table></div>
@@ -190,6 +192,10 @@ table.res td{padding:4px}table.res input,table.res select{padding:6px 8px;font-s
  <p>Choose a folder (for example a folder on a USB drive, or Documents\SARP YED). Each time you reopen the form, click Choose save folder and pick the same folder again; Chrome opens it for you. After every save, edit or delete the form writes two files there automatically: <b>SARP_YED_autosave_&lt;device&gt;.json</b> (the full backup, used to restore) and <b>SARP_YED_capture_&lt;device&gt;_latest.xlsx</b> (the Excel file). The previous backup is kept as <b>…_previous.json</b>. Works in Chrome or Edge on a computer.</p>
  <div class="btns"><button class="btn" id="pickDir">Choose save folder</button><button class="btn hide" id="reDir">Reconnect save folder</button><button class="btn sec hide" id="stopDir">Stop saving to folder</button></div>
  <p class="small" id="autoInfo"></p>
+</div>
+<div class="card"><h2>Paper fallback</h2>
+ <p>If the laptop fails during a session, print this blank form in advance and capture on paper. Enter the paper forms into this form later; write the capture reference on each paper form once entered.</p>
+ <div class="btns"><button class="btn sec" id="printBlank">Print blank paper form</button></div>
 </div>
 <div class="card"><h2>Export to Excel</h2>
  <p>Downloads an Excel workbook (.xlsx) with three sheets: Applicants, Existing resources and Required resources. Resource rows carry the capture reference so they link back to the applicant. NIC and phone numbers are kept as text.</p>
@@ -559,7 +565,20 @@ $("#cancelEdit").onclick = () => resetForm(false);
 
 // ---------- list ----------
 function gnLabel(r) { return r.gnNo || r.gnName ? `${r.gnNo ? r.gnNo + " – " : ""}${r.gnName}` : ""; }
+function summaryData() {
+  const recs = DB.records, cnt = (f) => { const m = {}; recs.forEach((r) => { const k = f(r) || "(blank)"; m[k] = (m[k] || 0) + 1; }); return Object.entries(m).sort((a, b) => b[1] - a[1]); };
+  const band = (r) => { const a = r.age ?? ageOn(r.dob, new Date(r.capturedAt)); if (a == null) return "(blank)"; if (a < S.ageMin || a > S.ageMax) return `Outside ${S.ageMin}–${S.ageMax}`; return a <= 24 ? "18–24" : a <= 29 ? "25–29" : "30–35"; };
+  return {
+    total: recs.length, check: recs.filter((r) => r.status === "Check").length, typedGn: recs.filter((r) => r.district && r.ds && r.gnFromList === false).length,
+    groups: [["District", cnt((r) => r.district)], ["DS division", cnt((r) => `${r.district} / ${r.ds}`)], ["Business category", cnt((r) => r.category)], ["Type of business", cnt((r) => r.type)], ["Gender", cnt((r) => r.gender)], ["Age band", cnt(band)], ["Preferred language", cnt((r) => r.lang)], ["Indo-Lanka consultancy consent", cnt((r) => r.consultConsent)], ["Captured by", cnt((r) => r.capturedBy)]],
+  };
+}
+function renderSummary() {
+  const d = summaryData(); if (!d.total) { $("#sumCard").classList.add("hide"); return; } $("#sumCard").classList.remove("hide");
+  $("#sumBody").innerHTML = `<p><b>${d.total}</b> captured · <b>${d.check}</b> need checking · <b>${d.typedGn}</b> with a typed DS/GN (not on the audit list)</p><div class="grid">` + d.groups.filter(([t]) => t !== "DS division").map(([t, rows]) => `<div><b>${esc(t)}</b><table>${rows.map(([k, n]) => `<tr><td>${esc(k)}</td><td style="text-align:right">${n}</td></tr>`).join("")}</table></div>`).join("") + `</div>`;
+}
 function renderList() {
+  renderSummary();
   const q = $("#search").value.trim().toLowerCase();
   const rs = DB.records.filter((r) => !q || [r.name, r.nic.slice(-4), r.mobile, r.district, r.ds, r.gnName, r.gnNo, r.ref].join(" ").toLowerCase().includes(q));
   $("#empty").classList.toggle("hide", DB.records.length > 0);
@@ -610,7 +629,9 @@ function buildXlsx() {
   const ex = [["Capture ref", "Applicant", "NIC number", "Row", "Item", "Quantity", "Unit", "Condition / status", "Remarks"]];
   const rq = [["Capture ref", "Applicant", "NIC number", "Row", "Item", "Quantity", "Unit", "Estimated cost (LKR)", "Priority", "Remarks"]];
   DB.records.forEach((r) => { (r.resEx || []).forEach((x, i) => ex.push([r.ref, r.name, r.nic, i + 1, x.item, cellOf("qty", x.qty), x.unit, x.cond, x.remarks])); (r.resRq || []).forEach((x, i) => rq.push([r.ref, r.name, r.nic, i + 1, x.item, cellOf("qty", x.qty), x.unit, cellOf("cost", x.cost), x.priority, x.remarks])); });
-  return xlsx([{ name: "Applicants", rows: app }, { name: "Existing resources", rows: ex }, { name: "Required resources", rows: rq }]);
+  const sd = summaryData(), sum = [["Item", "Value", "Count"], ["Exported", new Date().toLocaleString("en-GB"), ""], ["Device", S.device || "", ""], ["Total captured", "", sd.total], ["Need checking", "", sd.check], ["Typed DS/GN (not on audit list)", "", sd.typedGn]];
+  sd.groups.forEach(([t, rows]) => rows.forEach(([k, n]) => sum.push([t, k, n])));
+  return xlsx([{ name: "Applicants", rows: app }, { name: "Existing resources", rows: ex }, { name: "Required resources", rows: rq }, { name: "Summary", rows: sum }]);
 }
 $("#expXlsx").onclick = () => {
   if (!DB.records.length) return toast("No records to export");
@@ -659,6 +680,38 @@ $("#impJson").onchange = async (e) => {
 $("#wipe").onclick = async () => { if (!DB.records.length) return toast("No records on this device"); if (!backedUp()) return toast("Download a backup of the latest changes before deleting"); if (await ask(`Delete all ${DB.records.length} records from this device? Do this only after the files are safely handed over.`)) { DB = { records: [], seq: DB.seq || 0 }; store(KEY, DB); refresh(); renderExport(); toast("All records deleted from this device"); } };
 function backedUp() { return !!DB.lastBackup && (!DB.changedAt || DB.lastBackup >= DB.changedAt); }
 function renderExport() { $("#lastExp").textContent = (DB.lastBackup ? `Last backup: ${new Date(DB.lastBackup).toLocaleString()} (${DB.backupCount} records)` : "No backup yet.") + (DB.lastXlsx ? ` · Last Excel export: ${new Date(DB.lastXlsx).toLocaleString()}` : "") + (DB.records.length && !backedUp() ? " · Changes since last backup." : ""); }
+
+// ---------- printable blank form ----------
+function blankFormHtml() {
+  const L = (t, w = "100%") => `<div class="f"><span>${t}</span><i style="width:${w}"></i></div>`, B = (opts) => opts.map((o) => `<label>☐ ${o}</label>`).join(" ");
+  const cats = S.cats.concat(["Other: ________________"]);
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>SARP YED pre-registration: paper form</title><style>
+  body{font:11.5px/1.35 Arial,sans-serif;color:#111;margin:11mm 12mm}h1{font-size:16px;margin:0 0 2px}h2{font-size:12.5px;margin:8px 0 3px;border-bottom:1px solid #444}
+  .f{display:flex;gap:6px;align-items:flex-end;margin:4px 0}.f span{white-space:nowrap}.f i{border-bottom:1px dotted #333;height:14px;display:inline-block;flex:1}
+  .row{display:flex;gap:16px}.row>div{flex:1}label{margin-right:10px;white-space:nowrap}.small{font-size:10px;color:#444}
+  table{width:100%;border-collapse:collapse}td,th{border:1px solid #555;height:20px;padding:2px 4px;font-size:11px;text-align:left}
+  @page{size:A4;margin:0}@media print{button{display:none}}</style></head><body>
+  <button onclick="print()" style="float:right;padding:8px 14px">Print</button>
+  <h1>SARP YED: pre-registration (paper form)</h1><div class="small">Use only if the laptop is not available. Enter into the capture form later. Fields marked * are required.</div>
+  <div class="row"><div>${L("Capture ref (filled when entered)")}</div><div>${L("Date")}</div><div>${L("Captured by")}</div></div>
+  <h2>Location</h2><div class="row"><div>${L("District *")}</div><div>${L("DS division *")}</div></div><div class="row"><div>${L("GN division name *")}</div><div>${L("GN number")}</div><div>${L("Agrarian Service Centre")}</div></div>
+  <h2>Personal details</h2>${L("Full name as on NIC *")}<div class="row"><div>${L("NIC number *")}</div><div>${L("Date of birth *")}</div></div>
+  <div>Gender *: ${B(["Female", "Male", "Other", "Prefer not to say"])}</div><div>Preferred language *: ${B(["Sinhala", "Tamil", "English"])}</div>
+  <div>Education: ${B(["Below O/L", "O/L", "A/L", "Vocational / NVQ", "Diploma", "Degree", "Postgraduate"])}</div>
+  <div class="row"><div>${L("Mobile *")}</div><div>${L("WhatsApp")}</div><div>${L("Email")}</div></div>${L("Permanent address *")}
+  <h2>Business and land</h2>${L("Proposed agribusiness *")}<div>Business category *: ${B(cats)}</div>
+  <div>Type *: ${B(["Start-up", "Scale-up"])} &nbsp; Business registered: ${B(["Yes", "No"])} ${L("Reg. no. / authority", "40%")}</div>
+  <div>Land ownership: ${B(["Owned", "Leased", "Family-owned", "Other"])}</div><div class="row"><div>${L("Land extent (acres)")}</div><div>${L("Building size (sq ft)")}</div><div>${L("Experience (years)")}</div></div>${L("Experience (describe)")}
+  <h2>Existing business (scale-up only)</h2><div class="row"><div>${L("Business name")}</div><div>${L("Brand")}</div><div>${L("Sector")}</div></div><div class="row"><div>${L("Investment to date (LKR)")}</div><div>${L("Annual turnover (LKR)")}</div><div>${L("Annual net profit (LKR)")}</div></div>
+  <h2>Proposed financial plan (LKR)</h2><div class="row"><div>${L("Total investment")}</div><div>${L("Own contribution")}</div><div>${L("Bank loan")}</div><div>${L("SARP contribution")}</div></div>
+  <h2>Resources</h2><table><tr><th>Existing: item</th><th>Qty</th><th>Unit</th><th>Condition</th><th>Required: item</th><th>Qty</th><th>Est. cost (LKR)</th><th>Priority</th></tr>${"<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>".repeat(3)}</table>
+  <h2>Consent</h2><div>1. Data-use consent form signed *: ${B(["Yes"])} Form serial: ______________ <span class="small">(no signature = do not record details)</span></div>
+  <div>2. Indo-Lanka consultancy consent (proposal drafting and related services by Indo-Lanka Greenhouse and Agri Solutions) *: ${B(["Yes", "No"])} <span class="small">No does not stop registration.</span></div>
+  <div>${B(["Original NIC seen", "NIC copy collected"])}</div>${L("Remarks")}
+  <div class="row" style="margin-top:14px"><div>${L("Applicant signature")}</div><div>${L("Captured by (signature)")}</div></div>
+  </body></html>`;
+}
+$("#printBlank").onclick = () => { const w = window.open("", "_blank"); if (!w) return toast("Allow pop-ups for this page to print the paper form"); w.document.write(blankFormHtml()); w.document.close(); w.focus(); };
 
 // ---------- automatic save to a folder ----------
 let dirHandle = null, dirOk = false, autoChain = Promise.resolve();

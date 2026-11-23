@@ -40,6 +40,7 @@ mkdir -p tests/capture-form/out
 node tests/capture-form/t3.js      # dropdowns and audit list
 node tests/capture-form/t5.js      # session setup
 node tests/capture-form/t6.js      # manual GN number
+node tests/capture-form/t7.js      # session summary, Excel summary sheet, paper form
 
 # 85-applicant run and Excel check (needs a local web server for the folder auto-save test)
 cd capture-form && python3 -m http.server 8765 &   # from the repository root
@@ -51,13 +52,13 @@ cd tests/capture-form && python3 gen.py && node run85.js && python3 compare.py
 ### Full website QA (as served by GitHub Pages)
 
 ```bash
-mkdir -p /tmp/site/sarp-yed && cp -r index.html demo capture-form /tmp/site/sarp-yed/
+mkdir -p /tmp/site/sarp-yed && cp -r index.html 404.html demo capture-form /tmp/site/sarp-yed/
 (cd /tmp/site && python3 -m http.server 8766 &)
-node tests/site/site_qa.js                                   # 21 site and end-to-end checks
+node tests/site/site_qa.js                                   # 23 site and end-to-end checks
 APP=http://localhost:8766/sarp-yed/ node tests/demo/qa_suite.js   # 62 demo scenarios on the main page
 ```
 
-Latest results: `docs/SARP_YED_Website_QA_Results.xlsx` (223 of 223 passed, 24 November 2026).
+Latest results: `docs/SARP_YED_Website_QA_Results.xlsx` (all passed, 24 November 2026).
 
 ## Building the specification
 

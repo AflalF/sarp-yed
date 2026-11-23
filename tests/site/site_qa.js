@@ -41,6 +41,10 @@ ok('S-19','Mobile','Phone width (390 px): demo and embedded form fit without sid
 // ---- sizes
 const sz=['index.html','demo/sarp-yed-demo.html','capture-form/SARP_YED_Data_Capture.html'].map(x=>fs.statSync(require('path').resolve(__dirname,'../../'+x)).size);
 ok('S-20','Quality',`Page sizes reasonable (main ${Math.round(sz[0]/1024)} KB, form ${Math.round(sz[2]/1024)} KB)`,sz.every(x=>x<1.5e6));
+// ---- hygiene
+const pages=['index.html','demo/sarp-yed-demo.html','capture-form/SARP_YED_Data_Capture.html','404.html'];const miss=pages.filter(x=>!/<meta name="robots" content="noindex, nofollow">/.test(fs.readFileSync(require('path').resolve(__dirname,'../..',x),'utf8')));
+ok('S-22','Site','All pages ask search engines not to index them (noindex)',miss.length===0,miss.join(','));
+const np=await newPage();await np.goto(BASE+'404.html');ok('S-23','Site','Custom "Page not found" page links back to the main page',(await np.textContent('h1'))==='Page not found'&&(await np.getAttribute('a','href'))==='/sarp-yed/');
 // ---- timing
 const t=await newPage();const t0=Date.now();await t.goto(BASE,{waitUntil:'load'});const lt=Date.now()-t0;ok('S-21','Quality',`Main page loads quickly (${lt} ms locally)`,lt<3000,lt);
 fs.writeFileSync(OUT+'site_results.json',JSON.stringify(res,null,1));console.log(res.filter(r=>r.result=='PASS').length+'/'+res.length);await b.close();})();
