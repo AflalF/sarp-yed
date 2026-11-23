@@ -55,6 +55,7 @@ table.res td{padding:4px}table.res input,table.res select{padding:6px 8px;font-s
 </nav>
 <main>
 <noscript><div class="banner"><b>The form is not running.</b> Download this file and open it in Google Chrome or Microsoft Edge (double-click, or right-click &gt; Open with). A file preview cannot run the DS, GN and checking features.</div></noscript>
+<div id="onlineNote" class="banner hide">You are using the online copy of this form. <b>For real applicant data, <a id="dlSelf" href="#" download="SARP_YED_Data_Capture.html">download the form</a></b> and open the file on the capture laptop in Chrome or Edge. Records entered here stay only in this browser.</div>
 <div id="backupWarn" class="banner hide"></div>
 <div id="dirWarn" class="banner hide"><span id="dirWarnTxt"></span> <button class="btn sm" id="reDir2">Reconnect save folder</button></div>
 
@@ -722,6 +723,7 @@ if (!F("district").value && S.sessDistrict) { F("district").value = S.sessDistri
 refresh(); liveChecks();
 if (!S.capturer || !S.device) go("setup");
 autoUi();
+if (/^https?:$/.test(location.protocol)) { $("#onlineNote").classList.remove("hide"); $("#dlSelf").href = /\/capture-form\//.test(location.pathname) ? "SARP_YED_Data_Capture.html" : "capture-form/SARP_YED_Data_Capture.html"; }
 window.addEventListener("beforeunload", (e) => { if (DB.records.length && !backedUp()) { e.preventDefault(); e.returnValue = ""; } });
 </script>
 </body>
