@@ -2,7 +2,13 @@
 
 Work for Indo-Lanka Greenhouse and Agri Solutions (Pvt) Ltd, technical consultants to the Youth Enterprise Development (YED) component of SARP (Smallholder Agribusiness and Resilience Project, Ministry of Agriculture / IFAD).
 
-**Keep this repository private.** It contains no applicant data, but it does contain the DS/GN audit list and internal programme design.
+This repository contains no applicant data. Never commit capture backups or Excel exports.
+
+## Online
+
+- Main page: https://aflalf.github.io/sarp-yed/
+- Demo: https://aflalf.github.io/sarp-yed/demo/sarp-yed-demo.html
+- Capture form: https://aflalf.github.io/sarp-yed/capture-form/SARP_YED_Data_Capture.html (for showing the form; use the downloaded file for real data)
 
 ## What is here
 

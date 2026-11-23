@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SARP YED Management System: demo and data capture form</title>
+<style>
+:root{--g:#1f5e2b;--g2:#2e7d32;--bg:#f6f7f3;--line:#d6ddd3;--ink:#1f2a22;--mut:#5d6a60;--amb:#fbefdf}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.5 "Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);background:var(--bg)}
+header{background:var(--g);color:#f3f6f1;padding:32px 20px}
+.wrap{max-width:960px;margin:0 auto}
+h1{margin:0 0 6px;font-size:28px}
+header p{margin:0;color:#cfe3d1}
+main{padding:28px 20px 40px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:10px}
+.card h2{margin:0;font-size:20px;color:var(--g)}
+.card p{margin:0;color:var(--mut)}
+.card ul{margin:0;padding-left:20px;color:var(--ink)}
+.btn{display:inline-block;margin-top:auto;background:var(--g2);color:#fff;text-decoration:none;font-weight:600;padding:12px 18px;border-radius:8px;text-align:center}
+.btn:hover{background:var(--g)}
+.btn.sec{background:#fff;color:var(--g);border:1px solid var(--g2)}
+.note{background:var(--amb);border:1px solid #e5cba6;color:#6d3a0c;border-radius:10px;padding:14px 16px;margin-top:24px;font-size:15px}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:auto}
+footer{color:var(--mut);font-size:14px;padding:0 20px 30px}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <h1>SARP YED Management System</h1>
+  <p>Youth Enterprise Development · Indo-Lanka Greenhouse and Agri Solutions (Pvt) Ltd</p>
+</div></header>
+<main><div class="wrap">
+  <div class="cards">
+    <div class="card">
+      <h2>System demo</h2>
+      <p>Clickable demo of the full management system, with fictional sample data.</p>
+      <ul>
+        <li>9 user roles, from Field Officer to SARP PMU</li>
+        <li>Registration, eligibility review, interviews, proposals, approvals and SARP tracking</li>
+        <li>Import of pre-registration capture data</li>
+      </ul>
+      <div class="row"><a class="btn" href="demo/sarp-yed-demo.html">Open the demo</a></div>
+    </div>
+    <div class="card">
+      <h2>Data capture form</h2>
+      <p>Offline form for pre-registration of applicants before go-live.</p>
+      <ul>
+        <li>DS/GN audit list and the 13 business categories built in</li>
+        <li>Checks NIC, date of birth, consent and duplicates</li>
+        <li>Exports to Excel and saves backups to a folder</li>
+      </ul>
+      <div class="row"><a class="btn" href="capture-form/SARP_YED_Data_Capture.html">Open the form</a><a class="btn sec" href="capture-form/SARP_YED_Data_Capture.html" download>Download for offline use</a></div>
+    </div>
+  </div>
+  <div class="note"><b>For real applicant data,</b> download the capture form and open the file on the capture laptop in Chrome or Edge. The online copy is for showing how the form works. Records stay in the browser you use, so never enter real applicants on a shared or public computer.</div>
+</div></main>
+<footer><div class="wrap">Demo and form use fictional sample data. Specification v1.2 · November 2026.</div></footer>
+</body>
+</html>
