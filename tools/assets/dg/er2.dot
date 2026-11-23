@@ -1,0 +1,26 @@
+digraph ER {
+  graph [rankdir=LR, nodesep=0.18, ranksep=0.6, pad=0.2, splines=true];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=15, fillcolor="#E3EEFB", color="#1565C0", penwidth=1.3, height=0.45];
+  edge [color="#55635A", arrowhead=crow, arrowtail=tee, dir=both, penwidth=1.1, arrowsize=0.7];
+  USER; ROLE; DISTRICT; AUDIT_LOG [fillcolor="#EEEEEE", color="#888888"];
+  BENEFICIARY [fillcolor="#E8F5E9", color="#2E7D32"]; CONSENT [fillcolor="#E8F5E9", color="#2E7D32"];
+  APPLICATION [fillcolor="#1B5E20", fontcolor="white", color="#1B5E20", fontsize=17, width=2.4];
+  node [fillcolor="#FFF3E0", color="#E07B00"];
+  INTERVIEW; SITE_VISIT; INTERVIEW_SCORE; RESOURCE_ITEM; REQUIREMENT_ITEM;
+  node [fillcolor="#E3EEFB", color="#1565C0"];
+  ASSIGNMENT; PROPOSAL_SECTION; FINANCIAL_MODEL; FIN_LINE; GOV_RECOMMENDATION;
+  node [fillcolor="#F1EAF8", color="#6A3FA0"];
+  DOCUMENT; DOCUMENT_VERSION;
+  node [fillcolor="#FDECEC", color="#C62828"];
+  APPROVAL; SARP_REVIEW; GENERATED_OUTPUT; STATUS_HISTORY;
+  {rank=same; USER; DISTRICT}
+  {rank=same; CONSENT; BENEFICIARY}
+  ROLE -> USER; USER -> AUDIT_LOG; DISTRICT -> BENEFICIARY; DISTRICT -> USER [label=" scope", fontsize=9, fontname="Helvetica", dir=none, style=dashed];
+  BENEFICIARY -> CONSENT; BENEFICIARY -> APPLICATION [arrowhead=tee];
+  APPLICATION -> INTERVIEW; APPLICATION -> RESOURCE_ITEM; APPLICATION -> REQUIREMENT_ITEM; APPLICATION -> ASSIGNMENT;
+  APPLICATION -> PROPOSAL_SECTION; APPLICATION -> FINANCIAL_MODEL [arrowhead=tee]; APPLICATION -> GOV_RECOMMENDATION;
+  INTERVIEW -> SITE_VISIT; INTERVIEW -> INTERVIEW_SCORE; FINANCIAL_MODEL -> FIN_LINE;
+  APPLICATION -> DOCUMENT; APPLICATION -> APPROVAL; APPLICATION -> SARP_REVIEW;
+  APPLICATION -> GENERATED_OUTPUT; APPLICATION -> STATUS_HISTORY;
+  DOCUMENT_VERSION; DOCUMENT -> DOCUMENT_VERSION;
+}

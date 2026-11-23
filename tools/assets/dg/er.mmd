@@ -1,0 +1,24 @@
+erDiagram
+  direction TB
+  DISTRICT ||--o{ BENEFICIARY : "registered in"
+  USER }o--|| ROLE : has
+  USER }o--o{ DISTRICT : "scoped to"
+  BENEFICIARY ||--|| APPLICATION : owns
+  BENEFICIARY ||--o{ CONSENT : gives
+  APPLICATION ||--o{ INTERVIEW : has
+  INTERVIEW ||--o{ INTERVIEW_SCORE : "scored by panel"
+  INTERVIEW ||--o| SITE_VISIT : includes
+  APPLICATION ||--o{ RESOURCE_ITEM : "existing resources"
+  APPLICATION ||--o{ REQUIREMENT_ITEM : "proposed requirements"
+  APPLICATION ||--o{ ASSIGNMENT : "assigned to freelancer"
+  APPLICATION ||--o{ PROPOSAL_SECTION : "Sections 2-10"
+  APPLICATION ||--|| FINANCIAL_MODEL : has
+  FINANCIAL_MODEL ||--o{ FIN_LINE : "investment, cost, revenue, loan lines"
+  APPLICATION ||--o{ GOV_RECOMMENDATION : "Section 10"
+  APPLICATION ||--o{ DOCUMENT : has
+  DOCUMENT ||--o{ DOCUMENT_VERSION : versions
+  APPLICATION ||--o{ STATUS_HISTORY : "status changes"
+  APPLICATION ||--o{ APPROVAL : decisions
+  APPLICATION ||--o{ SARP_REVIEW : "external review stages"
+  APPLICATION ||--o{ GENERATED_OUTPUT : "final PDF, Word, Excel"
+  USER ||--o{ AUDIT_LOG : performs

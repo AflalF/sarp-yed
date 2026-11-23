@@ -1,0 +1,8 @@
+node_modules/
+out/
+*.log
+.DS_Store
+# never commit applicant data
+*autosave*.json
+*backup*.json
+SARP_YED_capture_*.xlsx

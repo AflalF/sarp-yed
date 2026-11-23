@@ -1,0 +1,36 @@
+flowchart TB
+  U["Internal users<br/>Field Officers · Senior Team · Freelancers<br/>Reviewers · Management · Admin"] -->|"HTTPS, TLS 1.2+<br/>MFA login"| WAF
+  G["Government Officials<br/>line agency / SARP PMU"] -->|"HTTPS, MFA"| WAF
+  ADM["System administrators"] -->|"VPN + MFA"| BAS["Bastion host"]
+  subgraph EDGE["Edge zone"]
+    WAF["Web application firewall<br/>+ reverse proxy · rate limiting"]
+  end
+  subgraph APPZ["Application zone (private subnet)"]
+    APP["Web application<br/>UI + REST API"]
+    Q[("Job queue / cache")]
+    WK["Background workers<br/>PDF · Word · Excel · AV scan<br/>AI jobs · notifications"]
+  end
+  subgraph DATAZ["Data zone (no internet access)"]
+    DB[("PostgreSQL<br/>encrypted at rest")]
+    OBJ[("Document store<br/>encrypted · versioned")]
+  end
+  WAF --> APP
+  APP --> Q --> WK
+  APP --> DB
+  APP --> OBJ
+  WK --> DB
+  WK --> OBJ
+  BAS --> APP
+  WK -->|"pseudonymised business text only"| AI["External AI API"]
+  WK --> SMS["SMS gateway"]
+  WK --> MAIL["Email (SMTP relay)"]
+  DB -.->|"encrypted backups"| BK[("Off-site backup<br/>separate location")]
+  OBJ -.-> BK
+  APP -.->|"logs"| SIEM["Central logging<br/>and monitoring"]
+  WAF -.-> SIEM
+  classDef ext fill:#FFF3E0,stroke:#E07B00,color:#1C2B1E
+  classDef core fill:#E3EEFB,stroke:#1565C0,color:#1C2B1E
+  classDef data fill:#E8F5E9,stroke:#2E7D32,color:#1C2B1E
+  class AI,SMS,MAIL,BK,SIEM ext
+  class APP,WK,Q,WAF,BAS core
+  class DB,OBJ data

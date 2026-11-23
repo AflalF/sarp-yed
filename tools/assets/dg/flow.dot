@@ -1,0 +1,59 @@
+digraph G {
+  graph [rankdir=TB, nodesep=0.35, ranksep=0.55, fontname="Helvetica", bgcolor="white", pad=0.2];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=11, width=1.75, height=0.75, margin="0.12,0.06", penwidth=1.4];
+  edge [fontname="Helvetica", fontsize=9.5, color="#55635A", penwidth=1.3, arrowsize=0.8];
+  node [fillcolor="#E8F5E9", color="#2E7D32"];
+  A [label="1 · Community outreach\nand registration\n(Field Officer)"];
+  B [label="2 · Applicant details\nSection 1"];
+  C [label="Eligible and\nNIC unique?", shape=diamond, width=1.6, height=1.0, style="filled"];
+  node [fillcolor="#FFF3E0", color="#E07B00"];
+  D [label="3a · Interview pack\nand scheduling\n(Senior Team)"];
+  E [label="3b · Interview form A–F\nand site verification"];
+  F [label="3c · Scorecard\nand decision", shape=diamond, width=1.6, height=1.0, style="filled"];
+  node [fillcolor="#E3EEFB", color="#1565C0"];
+  Gn [label="4 · Assign to\nfreelancer\n(Senior Team)"];
+  H [label="5 · Prepare proposal\nSections 2–10\n(Freelancer, AI-assisted)"];
+  node [fillcolor="#F1EAF8", color="#6A3FA0"];
+  I [label="6 · Upload supporting\ndocuments"];
+  J [label="7 · Verification\n(Reviewer)", shape=diamond, width=1.6, height=1.0, style="filled"];
+  node [fillcolor="#FDECEC", color="#C62828"];
+  K [label="8 · Management\napproval", shape=diamond, width=1.6, height=1.0, style="filled"];
+  L [label="9 · Generate final\napplication\n(record locked)"];
+  M [label="10 · Submit to SARP\n(SARP Liaison)"];
+  N [label="Line agency review\n(Government Official)"];
+  O [label="District / provincial\nreview"];
+  P [label="SARP Project\nCommittee\n(PMU Officer records)", shape=diamond, width=1.6, height=1.0, style="filled"];
+  Q [label="SARP approved\n→ SOP 06 monitoring\n(Phase 2)", fillcolor="#2E7D32", fontcolor="white", color="#1B5E20"];
+  node [fillcolor="#EEEEEE", color="#888888", fontcolor="#333333"];
+  X1 [label="Eligibility review\n(Senior Team decides;\nIneligible only if confirmed)", fillcolor="#FFF8E1", color="#E07B00", fontcolor="#1C2B1E"];
+  X2 [label="Not shortlisted /\nwithdrawn (closed)"];
+  X3 [label="SARP rejected\n(closed)"];
+  {rank=same; A; B; C; X1}
+  {rank=same; D; E; F; X2}
+  {rank=same; Gn; H; I; J}
+  {rank=same; K; L; M; N}
+  {rank=same; O; P; Q}
+  A -> B -> C;
+  C -> X1 [label=" No"];
+  X1 -> B [label=" Data corrected", style=dashed, color="#E07B00", fontcolor="#E07B00", constraint=false];
+  C -> D [label=" Yes", constraint=false];
+  D -> E -> F;
+  F -> X2 [label=" Decline"];
+  F -> Gn [label=" Shortlisted", constraint=false];
+  Gn -> H -> I -> J;
+  J -> K [label=" Verified", constraint=false];
+  K -> L [label=" Approved"];
+  L -> M -> N;
+  N -> O [constraint=false];
+  O -> P;
+  P -> Q [label=" Approved"];
+  P -> X3 [label=" Rejected", tailport=s, headport=n];
+  A -> D -> Gn -> K -> O [style=invis, weight=20];
+  B -> E -> H -> L -> P [style=invis, weight=20];
+  C -> F -> I -> M -> Q [style=invis, weight=20];
+  X1 -> X2 -> J -> N [style=invis, weight=20];
+  F -> D [label=" On hold", style=dashed, color="#E07B00", fontcolor="#E07B00", constraint=false];
+  J -> H [label=" Returned", style=dashed, color="#6A3FA0", fontcolor="#6A3FA0", constraint=false];
+  K -> H [label=" Returned", style=dashed, color="#C62828", fontcolor="#C62828", constraint=false];
+  P -> H [label=" Clarification", style=dashed, color="#C62828", fontcolor="#C62828", constraint=false];
+}

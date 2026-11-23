@@ -1,0 +1,23 @@
+flowchart TD
+  B --> C{"Eligible and<br/>NIC unique?"}
+  C -- No --> X1["Ineligible<br/>reason recorded, closed"]
+  C -- Yes --> D["3a · Interview pack and scheduling<br/>Senior Team"]
+  D --> E["3b · Interview form A–F<br/>and site verification"]
+  E --> F{"3c · Scorecard<br/>and decision"}
+  F -- On hold --> D
+  F -- "Not shortlisted / withdrawn" --> X2["Closed<br/>reason recorded"]
+  F -- Shortlisted --> G["4 · Assign to freelancer<br/>Senior Team"]
+  G --> H["5 · Prepare proposal, Sections 2–10<br/>Freelancer, AI-assisted"]
+  G --> H["5 · Prepare proposal → continues in Part 2"]
+  classDef s1 fill:#E8F5E9,stroke:#2E7D32,color:#1C2B1E
+  classDef s2 fill:#FFF3E0,stroke:#E07B00,color:#1C2B1E
+  classDef s3 fill:#E3EEFB,stroke:#1565C0,color:#1C2B1E
+  classDef s4 fill:#F1EAF8,stroke:#6A3FA0,color:#1C2B1E
+  classDef s5 fill:#FDECEC,stroke:#C62828,color:#1C2B1E
+  classDef x fill:#EEEEEE,stroke:#777777,color:#333333
+  class A,B,C s1
+  class D,E,F s2
+  class G,H s3
+  class I,J s4
+  class K,L,M,N,O,P,Q s5
+  class X1,X2,X3 x
