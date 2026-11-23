@@ -2,7 +2,7 @@
 const { chromium } = require("playwright");
 const path = require("path");
 const fs = require("fs");
-const APP = "file://" + path.resolve(__dirname, "../../demo/sarp-yed-demo.html");
+const APP = process.env.APP || ("file://" + path.resolve(__dirname, "../../demo/sarp-yed-demo.html"));
 const OUT = path.join(__dirname, "out");
 fs.mkdirSync(OUT, { recursive: true });
 

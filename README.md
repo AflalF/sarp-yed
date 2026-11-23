@@ -48,6 +48,17 @@ cd tests/capture-form && python3 gen.py && node run85.js && python3 compare.py
 
 `t2.js` also needs `tests/capture-form/out/gn_list.xlsx` (a small 4-column GN list) and `run85.js` writes `out/folder_backup.json`, which the demo's import tests read.
 
+### Full website QA (as served by GitHub Pages)
+
+```bash
+mkdir -p /tmp/site/sarp-yed && cp -r index.html demo capture-form /tmp/site/sarp-yed/
+(cd /tmp/site && python3 -m http.server 8766 &)
+node tests/site/site_qa.js                                   # 21 site and end-to-end checks
+APP=http://localhost:8766/sarp-yed/ node tests/demo/qa_suite.js   # 62 demo scenarios on the main page
+```
+
+Latest results: `docs/SARP_YED_Website_QA_Results.xlsx` (223 of 223 passed, 24 November 2026).
+
 ## Building the specification
 
 ```bash
